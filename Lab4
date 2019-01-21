@@ -1,0 +1,53 @@
+.data
+#prompt: .asciiz "Enter your integer:\n"
+space: .asciiz ", "
+
+.text
+main:
+					#get input from user
+#	li $v0, 4			#load syscal 4
+#	la $a0, prompt			#load prompt 
+#	syscall				#run print string
+	li $v0, 5			#load syscall 5
+	syscall				#run load int
+	la $s0, ($v0)			# (num)
+	li $t0, 3			# (a)
+	li $t7, 1
+	li $t6, 2
+	la $a0, ($t6)			
+	li $v0, 1	
+	syscall		
+loopa:
+	bgt $t0, $s0, end		#loopa
+	li $t1, 2			# (i)	
+	div $t2, $t0, 2 		# (a/2)
+loopb:
+	bgt $t1, $t2, primecheck	#loopb
+	rem $t3, $t0, $t1		#find remainder between $t0/$t1
+	beq $t3, 0, primeset		#if $t3 is equal to 0, set prime marker to 0
+loopbb:					#loopbb
+	add $t1, $t1, 1			#add 1 to the counter
+	ble $t1, $t2, loopb		#if the counter is still less than the comparison run loopb again
+	bgt $t1, $t2, primecheck	#if not run the prime checker label
+end:
+	li $v0, 10			#end
+	syscall
+primeset:				#primeset
+	li $t7, 0			#set prime marker to 0
+	j primecheck			
+primecheck:				#primecheck
+	beq $t7, 1, print		#if prime marker is 1 print #
+	li $t7, 1			#load #
+	add $t0, $t0, 1			#add 1 to a
+	j loopa				#restart loop a
+print:			
+	la $a0, space			# load space
+	li $v0, 4			#load syscall 4
+	syscall				#print space		#print
+	la $a0, ($t0)			#load #
+	li $v0, 1			#load syscall 1
+	syscall				# print #
+	li $t7, 1			#reset prime checker
+	add $t0, $t0, 1			#add 1 to a
+	j loopa				#restart at loopa
+
